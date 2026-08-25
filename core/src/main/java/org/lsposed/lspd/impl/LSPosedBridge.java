@@ -724,7 +724,9 @@ public class LSPosedBridge {
     }
 
     private static Object checkReturnType(Object result, Class<?> returnType) {
-        if (returnType != null && !HookBridge.instanceOf(result, returnType)) {
+        // IsInstanceOf always fails for primitive types (there's no instance of boolean.class),
+        // so skip the check for them like runModernAndLegacy does.
+        if (returnType != null && !returnType.isPrimitive() && !HookBridge.instanceOf(result, returnType)) {
             throw new ClassCastException(castException);
         }
         return result;
