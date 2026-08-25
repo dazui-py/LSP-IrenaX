@@ -248,9 +248,10 @@ public class LSPNotificationManager {
     private static final String SCOPE_CALLBACK_DESCRIPTOR = "io.github.libxposed.service.IXposedScopeCallback";
     // API 101 IXposedScopeCallback transaction codes. these collide with the API 100
     // ones, so we can't just call the interface directly (see notifyScopeRequest* below):
-    //   1 = onScopeRequestApproved(List<String>), 2 = onScopeRequestFailed(String)
-    private static final int SCOPE_CALLBACK_APPROVED_TRANSACTION = 1;
-    private static final int SCOPE_CALLBACK_FAILED_TRANSACTION = 2;
+    //   2 = onScopeRequestApproved(List<String>), 3 = onScopeRequestFailed(String)
+    // (AIDL-declared 1/2, +1 like every IXposedService code)
+    private static final int SCOPE_CALLBACK_APPROVED_TRANSACTION = 2;
+    private static final int SCOPE_CALLBACK_FAILED_TRANSACTION = 3;
 
     // deliver scope results on the wire the module was built with. API 100 modules get
     // per-package callbacks (approved/denied/timeout/failed with a package name),

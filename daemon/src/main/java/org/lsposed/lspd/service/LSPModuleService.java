@@ -227,20 +227,23 @@ public class LSPModuleService extends IXposedService.Stub {
 
     // dual-wire dispatch (API 100 vs API 101)
     //
-    // the IXposedService AIDL reused the same transaction codes across APIs
-    // but slapped different methods on 5/11/12:
-    //   5  = getFrameworkPrivilege (int)  in 100, getFrameworkProperties (long) in 101
-    //   11 = requestScope(String)          in 100, requestScope(List)          in 101
-    //   12 = removeScope(String)->String   in 100, removeScope(List)->void     in 101
-    // codes 1-4, 10 and 20-32 are type-compatible, so the generated stub keeps
-    // handling those. which wire a module speaks comes from module.prop
-    // targetApiVersion (API 100 modules don't declare it), so they keep working
-    // untouched. tbh idk if this survives the next API bump, but it's the only
-    // way to serve both APIs right now.
+    // the IXposedService AIDL reused the same transaction codes across APIs but
+    // slapped different methods on the privilege/properties and scope calls:
+    //   6  = getFrameworkPrivilege (int) in 100, getFrameworkProperties (long) in 101
+    //   12 = requestScope(String)         in 100, requestScope(List)          in 101
+    //   13 = removeScope(String)->String  in 100, removeScope(List)->void     in 101
+    // note the codes are the AIDL-declared values + 1: the AGP aidl compiler
+    // maps `= N` to FIRST_CALL_TRANSACTION + N, and both the daemon and every
+    // module are built with it, so the wire agrees (a module's getScope really
+    // arrives as 11). codes 2-5, 11 and 21-33 are type-compatible, so the
+    // generated stub keeps handling those. which wire a module speaks comes
+    // from module.prop targetApiVersion (API 100 modules don't declare it), so
+    // they keep working untouched. tbh idk if this survives the next API bump,
+    // but it's the only way to serve both APIs right now.
 
-    private static final int TRANSACTION_GET_FRAMEWORK_PRIVILEGE = 5;
-    private static final int TRANSACTION_REQUEST_SCOPE = 11;
-    private static final int TRANSACTION_REMOVE_SCOPE = 12;
+    private static final int TRANSACTION_GET_FRAMEWORK_PRIVILEGE = 6;
+    private static final int TRANSACTION_REQUEST_SCOPE = 12;
+    private static final int TRANSACTION_REMOVE_SCOPE = 13;
 
     private boolean speaksApi101() {
         return loadedModule.file != null && loadedModule.file.targetApiVersion >= 101;
