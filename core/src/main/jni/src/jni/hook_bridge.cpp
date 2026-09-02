@@ -670,9 +670,11 @@ LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, hookMethod, jint apiMode, jobject ho
     } else if (apiMode == API_MODE_100) {
         // libxposed API 100 HookerCallback (before/after method pair)
         hook_item->modern_callbacks.emplace(priority, env->NewGlobalRef(callback));
-    } else {
+    } else if (apiMode == API_MODE_101) {
         // libxposed API 101 hooker (XposedInterface.Hooker instance)
         hook_item->api101_callbacks.emplace(priority, env->NewGlobalRef(callback));
+    } else {
+        LOGW("Unknown apiMode {}", apiMode);
     }
     return JNI_TRUE;
 }
@@ -703,7 +705,7 @@ LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, unhookMethod, jint apiMode, jobject 
                 return JNI_TRUE;
             }
         }
-    } else {
+    } else if (apiMode == API_MODE_101) {
         for (auto i = hook_item->api101_callbacks.begin(); i != hook_item->api101_callbacks.end(); ++i) {
             if (env->IsSameObject(i->second, callback)) {
                 env->DeleteGlobalRef(i->second);

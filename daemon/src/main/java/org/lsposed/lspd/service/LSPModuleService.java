@@ -401,7 +401,9 @@ public class LSPModuleService extends IXposedService.Stub {
             } catch (RemoteException remote) {
                 throw remote;
             } catch (Throwable e) {
-                throw new RemoteException(e.getMessage(), e);
+                var re = new RemoteException(e.getMessage());
+                re.initCause(e);
+                throw re;
             }
         }
     }
