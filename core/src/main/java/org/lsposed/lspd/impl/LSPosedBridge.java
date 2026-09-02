@@ -520,7 +520,7 @@ public class LSPosedBridge {
 
         @Override
         public void unhook() {
-            HookBridge.unhookMethod(2, executable, hooker);
+            HookBridge.unhookMethod(HookBridge.API_MODE_101, executable, hooker);
         }
     }
 
@@ -660,7 +660,7 @@ public class LSPosedBridge {
             throw new IllegalArgumentException("hooker should not be null!");
         }
 
-        if (HookBridge.hookMethod(2, hookMethod, LSPosedBridge.NativeHooker.class, priority, hooker)) {
+        if (HookBridge.hookMethod(HookBridge.API_MODE_101, hookMethod, LSPosedBridge.NativeHooker.class, priority, hooker)) {
             return new HookHandleImpl(hookMethod, hooker);
         }
         throw new io.github.libxposed.api.error.HookFailedError("Cannot hook " + hookMethod);
@@ -816,7 +816,7 @@ public class LSPosedBridge {
         }
 
         var callback = new LSPosedBridge.HookerCallback(beforeInvocation, afterInvocation);
-        if (HookBridge.hookMethod(1, hookMethod, LSPosedBridge.NativeHooker.class, priority, callback)) {
+        if (HookBridge.hookMethod(HookBridge.API_MODE_100, hookMethod, LSPosedBridge.NativeHooker.class, priority, callback)) {
             return new XposedInterface.MethodUnhooker<>() {
                 @NonNull
                 @Override
@@ -826,7 +826,7 @@ public class LSPosedBridge {
 
                 @Override
                 public void unhook() {
-                    HookBridge.unhookMethod(1, hookMethod, callback);
+                    HookBridge.unhookMethod(HookBridge.API_MODE_100, hookMethod, callback);
                 }
             };
         }

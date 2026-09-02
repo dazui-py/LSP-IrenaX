@@ -618,6 +618,12 @@ jobject NewInstance(JNIEnv *env, InvokeCache &cache, jobject constructor, jobjec
 }
 
 namespace lspd {
+
+// apiMode values mirroring HookBridge.API_MODE_* on the Java side
+constexpr int API_MODE_LEGACY = 0;
+constexpr int API_MODE_100 = 1;
+constexpr int API_MODE_101 = 2;
+
 LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, hookMethod, jint apiMode, jobject hookMethod,
                       jclass hooker, jint priority, jobject callback) {
     bool newHook = false;
@@ -658,10 +664,10 @@ LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, hookMethod, jint apiMode, jobject ho
     jobject backup = hook_item->GetBackup();
     if (!backup) return JNI_FALSE;
     JNIMonitor monitor(env, backup);
-    if (apiMode == 0) {
+    if (apiMode == API_MODE_LEGACY) {
         // classic Xposed API (de.robv.android.xposed)
         hook_item->legacy_callbacks.emplace(priority, env->NewGlobalRef(callback));
-    } else if (apiMode == 1) {
+    } else if (apiMode == API_MODE_100) {
         // libxposed API 100 HookerCallback (before/after method pair)
         hook_item->modern_callbacks.emplace(priority, env->NewGlobalRef(callback));
     } else {
@@ -681,7 +687,7 @@ LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, unhookMethod, jint apiMode, jobject 
     jobject backup = hook_item->GetBackup();
     if (!backup) return JNI_FALSE;
     JNIMonitor monitor(env, backup);
-    if (apiMode == 0) {
+    if (apiMode == API_MODE_LEGACY) {
         for (auto i = hook_item->legacy_callbacks.begin(); i != hook_item->legacy_callbacks.end(); ++i) {
             if (env->IsSameObject(i->second, callback)) {
                 env->DeleteGlobalRef(i->second);
@@ -689,7 +695,7 @@ LSP_DEF_NATIVE_METHOD(jboolean, HookBridge, unhookMethod, jint apiMode, jobject 
                 return JNI_TRUE;
             }
         }
-    } else if (apiMode == 1) {
+    } else if (apiMode == API_MODE_100) {
         for (auto i = hook_item->modern_callbacks.begin(); i != hook_item->modern_callbacks.end(); ++i) {
             if (env->IsSameObject(i->second, callback)) {
                 env->DeleteGlobalRef(i->second);

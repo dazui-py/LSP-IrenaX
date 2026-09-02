@@ -11,10 +11,15 @@ import dalvik.annotation.optimization.FastNative;
 public class HookBridge {
 
     /**
-     * apiMode 0: classic Xposed API (de.robv.android.xposed) callbacks.
-     * apiMode 1: libxposed API 100 before/after hooker callbacks.
-     * apiMode 2: libxposed API 101 intercept hookers.
+     * apiMode for {@link #hookMethod} / {@link #unhookMethod}:
+     * {@link #API_MODE_LEGACY} = classic Xposed API (de.robv.android.xposed) callbacks,
+     * {@link #API_MODE_100} = libxposed API 100 before/after hooker callbacks,
+     * {@link #API_MODE_101} = libxposed API 101 intercept hookers.
      */
+    public static final int API_MODE_LEGACY = 0;
+    public static final int API_MODE_100 = 1;
+    public static final int API_MODE_101 = 2;
+
     public static native boolean hookMethod(int apiMode, Executable hookMethod, Class<?> hooker, int priority, Object callback);
 
     public static native boolean unhookMethod(int apiMode, Executable hookMethod, Object callback);
