@@ -398,8 +398,10 @@ public class LSPModuleService extends IXposedService.Stub {
                 if (!ConfigManager.getInstance().removeModuleScope(loadedModule.packageName, packageName, userId)) {
                     throw new RemoteException("Invalid request");
                 }
+            } catch (RemoteException remote) {
+                throw remote;
             } catch (Throwable e) {
-                throw new RemoteException(e.getMessage());
+                throw new RemoteException(e.getMessage(), e);
             }
         }
     }
